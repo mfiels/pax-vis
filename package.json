@@ -1,0 +1,10 @@
+{
+  "name": "pax-vis",
+  "description": "A Paxos visualizer",
+  "author": "Mark Fielbig <mfielbig@gmail.com>",
+  "dependencies": {
+    "socket.io": "*",
+    "node-static": "*"
+  },
+  "engine": "node 0.10.20"
+}

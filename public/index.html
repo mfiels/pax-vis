@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <h1>pax-vis</h1>
+    <script>
+      var socket = io.connect('http://localhost');
+      socket.on('data', function(data) {
+        console.log(data);
+      });
+    </script>
+  </body>
+</html>
