@@ -49,11 +49,11 @@ Visualizer.prototype.init = function(proposers, acceptors, learners) {
 };
 
 Visualizer.prototype._addGroup = function(x, size, count, color, group) {
-  console.log(size);
   x += (this.width * Visualizer.NODE_GROUP_WIDTH) / 2 - size / 2;
-  var y = this.height * Visualizer.NODE_VERTICAL_SPACING / (count + 1);
+  var startY = this.height * Visualizer.NODE_VERTICAL_SPACING / (count + 1);
+  var unusedHeight = this.height - (this.height * Visualizer.NODE_VERTICAL_SPACING + count * size);
+  var y = startY + unusedHeight / 2;
   for (var i = 0; i < count; i++) {
-    console.log(x, y);
     var node = new createjs.Shape();
     node.graphics.beginFill(color).drawCircle(size / 2, size / 2, size / 2);
     node.x = x;

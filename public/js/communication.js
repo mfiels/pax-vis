@@ -16,10 +16,12 @@ Communication.prototype.data = function(data) {
 };
 
 Communication.prototype.onConnect = function(message) {
-  this.visualizer.init(
-    message.configuration.proposers,
-    message.configuration.acceptors,
-    message.configuration.learners);
+  if (message.type == 'algorithm') {
+    this.visualizer.init(
+      message.configuration.proposers,
+      message.configuration.acceptors,
+      message.configuration.learners);
+  }
 };
 
 var socket = io.connect('http://localhost');
