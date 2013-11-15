@@ -2,14 +2,18 @@
 <html>
   <head>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/lib/easeljs-0.7.0.min.js"></script>
+    <style>
+      #canvas {
+        display: block;
+        margin: 0 auto;
+        border: 1px solid black;
+      }
+    </style>
   </head>
   <body>
-    <h1>pax-vis</h1>
-    <script>
-      var socket = io.connect('http://localhost');
-      socket.on('data', function(data) {
-        console.log(data);
-      });
-    </script>
+    <canvas id="canvas" width="800px" height="600px"></canvas>
+    <script src="/js/visualizer.js"></script>
+    <script src="/js/communication.js"></script>
   </body>
 </html>

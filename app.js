@@ -54,6 +54,7 @@ var ApiSocket = {
       'type': 'application',
       'name': 'visualizer',
       'interests': [
+        'connect',
         'request',
         'prepare',
         'promise',
