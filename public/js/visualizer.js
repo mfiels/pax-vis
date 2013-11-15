@@ -7,9 +7,10 @@ var Visualizer = function() {
   this.numAcceptors = 0;
   this.numLearners = 0;
 
-  this.proposers = [];
-  this.acceptors = [];
-  this.learners = [];
+  this.proposers = {};
+  this.acceptors = {};
+  this.learners = {};
+  this.nodes = {};
 };
 
 Visualizer.NODE_VERTICAL_SPACING = 0.2;
@@ -21,9 +22,9 @@ Visualizer.ACCEPTOR_COLOR = 'green';
 Visualizer.LEARNER_COLOR = 'blue';
 
 Visualizer.prototype.init = function(proposers, acceptors, learners) {
-  this.numProposers = proposers;
-  this.numAcceptors = acceptors;
-  this.numLearners = learners;
+  this.numProposers = proposers.length;
+  this.numAcceptors = acceptors.length;
+  this.numLearners = learners.length;
 
   var largestGroupSize = Math.max(this.numProposers, this.numAcceptors, this.numLearners);
   var size = this.height * (1 - Visualizer.NODE_VERTICAL_SPACING) / largestGroupSize;
@@ -33,22 +34,25 @@ Visualizer.prototype.init = function(proposers, acceptors, learners) {
     size, 
     this.numProposers, 
     Visualizer.PROPOSER_COLOR, 
-    this.proposers);
+    this.proposers,
+    proposers);
   this._addGroup(
     1 * Visualizer.NODE_GROUP_WIDTH * this.width,
     size, 
     this.numAcceptors, 
     Visualizer.ACCEPTOR_COLOR, 
-    this.acceptors);
+    this.acceptors,
+    acceptors);
   this._addGroup(
     2 * Visualizer.NODE_GROUP_WIDTH * this.width, 
     size, 
     this.numLearners, 
     Visualizer.LEARNER_COLOR, 
-    this.learners);
+    this.learners,
+    learners);
 };
 
-Visualizer.prototype._addGroup = function(x, size, count, color, group) {
+Visualizer.prototype._addGroup = function(x, size, count, color, group, ids) {
   x += (this.width * Visualizer.NODE_GROUP_WIDTH) / 2 - size / 2;
   var startY = this.height * Visualizer.NODE_VERTICAL_SPACING / (count + 1);
   var unusedHeight = this.height - (this.height * Visualizer.NODE_VERTICAL_SPACING + count * size);
@@ -58,7 +62,8 @@ Visualizer.prototype._addGroup = function(x, size, count, color, group) {
     node.graphics.beginFill(color).drawCircle(size / 2, size / 2, size / 2);
     node.x = x;
     node.y = y;
-    group.push(node);
+    group[ids[i]] = node;
+    this.nodes[ids[i]] = node;
     this.stage.addChild(node);
 
     y += this.height * Visualizer.NODE_VERTICAL_SPACING / (count + 1) + size;
