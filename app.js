@@ -83,7 +83,7 @@ var ApiSocket = {
 
 };
 
-var server = http.createServer(HttpServer.onRequest).listen(8080);
+var server = http.createServer(HttpServer.onRequest).listen(8888);
 var ioServer = io.listen(server);
 ioServer.sockets.on('connection', IoServer.onConnection);
 ApiSocket.socket = net.connect(9000, 'localhost', ApiSocket.onConnection);

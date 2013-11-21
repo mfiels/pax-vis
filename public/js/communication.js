@@ -9,9 +9,16 @@ var Communication = function(socket, visualizer) {
 
 Communication.prototype.data = function(data) {
   console.log('got data', data);
-  var actionHandler = 'on' + data.action[0].toUpperCase() + data.action.substring(1).toLowerCase();
-  if (this[actionHandler]) {
-    this[actionHandler](data);
+  switch (data.action) {
+    case 'connect':
+      this.onConnect(data);
+      break;
+    case 'prepare':
+    case 'promise':
+    case 'propose':
+    case 'accept':
+    case 'nack': 
+      this.onAlgorithmMessage(data);
   }
 };
 
@@ -22,6 +29,10 @@ Communication.prototype.onConnect = function(message) {
       message.configuration.acceptors,
       message.configuration.learners);
   }
+};
+
+Communication.prototype.onAlgorithmMessage = function(message) {
+  this.visualizer.sendMessage(message.src, message.dest, message);
 };
 
 var socket = io.connect('http://localhost');
