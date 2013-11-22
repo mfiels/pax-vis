@@ -15,6 +15,11 @@ var Visualizer = function() {
   this.acceptors = {};
   this.learners = {};
   this.nodes = {};
+  this.sprites = [];
+
+  this.playhead = new Playhead();
+  this.stage.addChild(this.playhead.buffered);
+  this.stage.addChild(this.playhead.playhead);
 };
 
 //-----Constants-----/
@@ -31,6 +36,8 @@ Visualizer.ACCEPTOR_COLOR = '#8e44ad';
 Visualizer.LEARNER_COLOR = '#A6E22E';
 
 Visualizer.MESSAGE_COLOR = '#f1c40f';
+
+Visualizer.SHADOW_COLOR = 'black';
 
 //-----Initialization-----/
 
@@ -49,44 +56,69 @@ Visualizer.prototype.init = function(clients, proposers, acceptors, learners) {
     this.numClients, 
     Visualizer.CLIENT_COLOR, 
     this.clients,
-    clients);
+    clients,
+    'C');
   this._addGroup(
     1 * Visualizer.NODE_GROUP_WIDTH * this.width, 
     size, 
     this.numProposers, 
     Visualizer.PROPOSER_COLOR, 
     this.proposers,
-    proposers);
+    proposers,
+    'P');
   this._addGroup(
     2 * Visualizer.NODE_GROUP_WIDTH * this.width,
     size, 
     this.numAcceptors, 
     Visualizer.ACCEPTOR_COLOR, 
     this.acceptors,
-    acceptors);
+    acceptors,
+    'A');
   this._addGroup(
     3 * Visualizer.NODE_GROUP_WIDTH * this.width, 
     size, 
     this.numLearners, 
     Visualizer.LEARNER_COLOR, 
     this.learners,
-    learners);
+    learners,
+    'L');
 };
 
-Visualizer.prototype._addGroup = function(x, size, count, color, group, ids) {
+Visualizer.prototype._addGroup = function(x, size, count, color, group, ids, name) {
   x += (this.width * Visualizer.NODE_GROUP_WIDTH) / 2 - size / 2;
   var startY = this.height * Visualizer.NODE_VERTICAL_SPACING / (count + 1);
   var unusedHeight = this.height - (this.height * Visualizer.NODE_VERTICAL_SPACING + count * size);
   var y = startY + unusedHeight / 2;
   for (var i = 0; i < count; i++) {
-    var node = new createjs.Shape();
-    node.graphics.beginFill(color).drawCircle(size / 2, size / 2, size / 2);
-    node.x = x;
-    node.y = y;
-    node.size = size;
-    group[ids[i]] = node;
-    this.nodes[ids[i]] = node;
-    this.stage.addChild(node);
+    var nodeShape = new createjs.Shape();
+    nodeShape.graphics.beginFill(Visualizer.SHADOW_COLOR)
+      .drawCircle(size / 2 + 2, size / 2 + 2, size / 2);
+    nodeShape.graphics.beginFill(color)
+      .drawCircle(size / 2, size / 2, size / 2);
+
+    var nodeText = new createjs.Text(name + ids[i], '24px Verdana', 'white');
+    nodeText.x = size / 2;
+    nodeText.y = size / 2 - nodeText.getMeasuredHeight() / 2.0;
+    nodeText.textAlign = 'center';
+
+    var nodeTextShadow = new createjs.Text(name + ids[i], '24px Verdana', '#272822');
+    nodeTextShadow.x = size / 2 + 2;
+    nodeTextShadow.y = size / 2 - nodeTextShadow.getMeasuredHeight() / 2.0 + 2;
+    nodeTextShadow.textAlign = 'center';
+
+    var nodeSprite = new createjs.Container();
+    nodeSprite.x = x;
+    nodeSprite.y = y;
+    nodeSprite.size = size;
+
+    group[ids[i]] = nodeSprite;
+    this.nodes[ids[i]] = nodeSprite;
+
+    nodeSprite.addChild(nodeShape);
+    nodeSprite.addChild(nodeTextShadow);
+    nodeSprite.addChild(nodeText);
+
+    this.stage.addChild(nodeSprite);
 
     y += this.height * Visualizer.NODE_VERTICAL_SPACING / (count + 1) + size;
   }
@@ -111,6 +143,11 @@ Visualizer.prototype.sendMessage = function(src, dest, message) {
 
 Visualizer.prototype._sendMessage = function(src, dest, message) {
   var messageShape = new createjs.Shape();
+  messageShape.graphics.beginFill(Visualizer.SHADOW_COLOR)
+    .drawCircle(
+      Visualizer.MESSAGE_SIZE / 2 + 1, 
+      Visualizer.MESSAGE_SIZE / 2 + 1, 
+      Visualizer.MESSAGE_SIZE / 2);
   messageShape.graphics.beginFill(Visualizer.MESSAGE_COLOR)
     .drawCircle(
       Visualizer.MESSAGE_SIZE / 2,
@@ -138,15 +175,14 @@ Visualizer.prototype._sendMessage = function(src, dest, message) {
   messageSprite.x = srcX;
   messageSprite.y = srcY;
 
+  this.sprites.push(messageSprite);
+
   var self = this;
   createjs.Tween
       .get(messageSprite)
       .to({alpha: 1.0}, 300)
       .to({x: destX, y: destY}, 1000, createjs.Ease.sineInOut)
-      .to({alpha: 0.0}, 300)
-      .call(function() {
-        self.stage.removeChild(messageSprite);
-      });
+      .to({alpha: 0.0}, 300);
 
   this.stage.addChild(messageSprite);
 };
@@ -155,12 +191,24 @@ Visualizer.prototype._sendMessage = function(src, dest, message) {
 
 Visualizer.prototype.update = function(e) {
   var delta = e.delta;
+
+  Pangaea.tick(delta);
+  this.playhead.update(delta);
+
+  if (!Pangaea.isSynced()) {
+    this.sprites.forEach(function(element) {
+      ParametricPlugin.transform(element, Pangaea.getPlayhead());
+    });
+  }
+
   this.stage.update();
 };
 
 //-----Instantiation-----//
 
 vis = new Visualizer();
+
+createjs.Tween.onStepAdded = ParametricPlugin.onStepAdded;
 createjs.Ticker.setFPS(60);
 createjs.Ticker.addEventListener('tick', function(e) {
   vis.update.apply(vis, [e]);
