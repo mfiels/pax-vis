@@ -25,9 +25,10 @@ Communication.prototype.data = function(data) {
 Communication.prototype.onConnect = function(message) {
   if (message.type == 'algorithm') {
     this.visualizer.init(
-      message.configuration.proposers,
-      message.configuration.acceptors,
-      message.configuration.learners);
+      message.configuration.clients,
+      message.configuration.replicas,
+      message.configuration.leaders,
+      message.configuration.acceptors);
   }
 };
 

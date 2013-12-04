@@ -5,15 +5,17 @@ var Visualizer = function() {
   this.width = this.stage.canvas.width;
   this.height = this.stage.canvas.height;
 
+  this.initialized = false;
+
   this.numClients = 0;
-  this.numProposers = 0;
+  this.numReplicas = 0;
+  this.numLeaders = 0;
   this.numAcceptors = 0;
-  this.numLearners = 0;
 
   this.clients = {};
-  this.proposers = {};
+  this.replicas = {};
+  this.leaders = {};
   this.acceptors = {};
-  this.learners = {};
   this.nodes = {};
   this.sprites = [];
 
@@ -31,7 +33,7 @@ Visualizer.NODE_GROUP_WIDTH = 1 / Visualizer.NUM_GROUPS;
 Visualizer.MESSAGE_SIZE = 75;
 
 Visualizer.CLIENT_COLOR = '#F92672';
-Visualizer.PROPOSER_COLOR = '#66D9EF';
+Visualizer.REPLICA_COLOR = '#66D9EF';
 Visualizer.ACCEPTOR_COLOR = '#8e44ad';
 Visualizer.LEARNER_COLOR = '#A6E22E';
 
@@ -41,13 +43,14 @@ Visualizer.SHADOW_COLOR = 'black';
 
 //-----Initialization-----/
 
-Visualizer.prototype.init = function(clients, proposers, acceptors, learners) {
+Visualizer.prototype.init = function(clients, replicas, leaders, acceptors) {
   this.numClients = clients.length;
-  this.numProposers = proposers.length;
+  this.numReplicas = replicas.length;
+  this.numLeaders = leaders.length;
   this.numAcceptors = acceptors.length;
-  this.numLearners = learners.length;
 
-  var largestGroupSize = Math.max(this.numProposers, this.numAcceptors, this.numLearners);
+  var largestGroupSize = Math.max(
+      this.numClients, this.numReplicas, this.numLeaders, this.numAcceptors);
   var size = this.height * (1 - Visualizer.NODE_VERTICAL_SPACING) / largestGroupSize;
 
   this._addGroup(
@@ -61,27 +64,29 @@ Visualizer.prototype.init = function(clients, proposers, acceptors, learners) {
   this._addGroup(
     1 * Visualizer.NODE_GROUP_WIDTH * this.width, 
     size, 
-    this.numProposers, 
-    Visualizer.PROPOSER_COLOR, 
-    this.proposers,
-    proposers,
-    'P');
+    this.numReplicas, 
+    Visualizer.REPLICA_COLOR, 
+    this.replicas,
+    replicas,
+    'R');
   this._addGroup(
     2 * Visualizer.NODE_GROUP_WIDTH * this.width,
     size, 
-    this.numAcceptors, 
+    this.numLeaders, 
     Visualizer.ACCEPTOR_COLOR, 
-    this.acceptors,
-    acceptors,
-    'A');
+    this.leaders,
+    leaders,
+    'L');
   this._addGroup(
     3 * Visualizer.NODE_GROUP_WIDTH * this.width, 
     size, 
-    this.numLearners, 
+    this.numAcceptors, 
     Visualizer.LEARNER_COLOR, 
-    this.learners,
-    learners,
-    'L');
+    this.acceptors,
+    acceptors,
+    'A');
+
+  this.initialized = true;
 };
 
 Visualizer.prototype._addGroup = function(x, size, count, color, group, ids, name) {
@@ -192,8 +197,10 @@ Visualizer.prototype._sendMessage = function(src, dest, message) {
 Visualizer.prototype.update = function(e) {
   var delta = e.delta;
 
-  Pangaea.tick(delta);
-  this.playhead.update(delta);
+  if (vis.initialized) {
+    Pangaea.tick(delta);
+    this.playhead.update(delta);
+  }
 
   if (!Pangaea.isSynced()) {
     this.sprites.forEach(function(element) {
