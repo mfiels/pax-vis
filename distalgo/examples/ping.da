@@ -1,0 +1,31 @@
+
+class Pong(DistProcess):
+  def setup(): pass
+
+  def main():
+    await(False)
+
+  def OnPing(p):
+    output("Pinged")
+    send(Pong(), p)
+
+class Ping(DistProcess):
+  def setup(p): pass
+
+  def main():
+    while True:
+      purge_received()
+      send(Ping(self), p)
+      await(received(Pong()))
+      work()
+
+  def OnPong():
+    output("Ponged.")
+
+def main():
+  pong = createprocs(Pong, 1)
+  ping = createprocs(Ping, 3)
+  setupprocs(ping, [pong])
+  startprocs(pong)
+  startprocs(ping)
+  for p in pong: p.join()

@@ -1,0 +1,14 @@
+DistAlgo - Python language extension library for programming distributed algorithms
+v 0.1
+	* added Initial version
+v 0.2
+	* changed message history data structure to list
+	* fixed some error reporting messages
+	* fixed logger for endpoints not set in __setstate__
+	* improved retry on tcp send error
+	* fixed socket.error not caught on tcp connect
+	* improved EndPoint to mimick Process
+	* changed collect_statistics to work in background thread
+	* implemented proper program termination on return from 'main'
+	* deprecated createnamedprocs. Named procs can now be created by
+	  createprocs
