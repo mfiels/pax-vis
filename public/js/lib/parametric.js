@@ -3,6 +3,7 @@
   var ParametricPlugin = {
     table: {},
     nextId: 1,
+    recordStart: 0.0,
 
     onTweenRegistered: function(tween) {
     },
@@ -10,7 +11,7 @@
     onStepAdded: function(tween, step) {
       var target = tween.target;
 
-      var startTime = tween.startedAt;
+      var startTime = tween.startedAt - ParametricPlugin.recordStart;
       for (var key in step.p1) {
         var slice = new ParametricSlice(
           startTime + step.t,

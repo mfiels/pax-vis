@@ -50,18 +50,24 @@ var ApiSocket = {
 
   sendConnectionInfo: function() {
     var connectMessage = {
-      'action': 'connect',
+      'action': 'Connect',
       'type': 'application',
       'name': 'visualizer',
       'interests': [
-        'connect',
-        'request',
-        'prepare',
-        'promise',
-        'propose',
-        'accept',
-        'nack',
-        'response'
+        'Connect',
+        'Request',
+        'Propose',
+        'Adopted',
+        'Decision',
+        'Response',
+        'P1a',
+        'P1b',
+        'P2a',
+        'P2b',
+        'Preempted',
+        'Spawn',
+        'Terminate',
+        'Slot'
       ]
     };
 

@@ -7,6 +7,7 @@
     this._playheadPaused = false;
     this._clockPaused = false;
     this._listeners = [];
+    this.scale = 1 / 5.0;
   };
 
   Pangaea.prototype.tick = function(delta) {
@@ -19,7 +20,7 @@
       if (this._synced) {
         this._playhead = this._clock;
       } else {
-        this._playhead += delta;
+        this._playhead += delta * this.scale;
       }
     }
   };

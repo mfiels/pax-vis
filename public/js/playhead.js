@@ -6,7 +6,7 @@ var Playhead = function() {
   buffered.scaleX = 0.0;
 
   var playhead = new createjs.Shape();
-  playhead.graphics.beginFill('blue').drawCircle(0.0, 0, 10);
+  playhead.graphics.beginFill('white').drawCircle(0.0, 0, 10);
   playhead.x = 0;
   playhead.y = 590;
 
@@ -24,6 +24,9 @@ var Playhead = function() {
   this.buffered = buffered;
   this.playhead = playhead;
   this.downOnPlayhead = false;
+
+  Pangaea.pause();
+  createjs.Tween.synced = false;
 };
 
 Playhead.MS_PER_PX = 50;
