@@ -7,6 +7,7 @@ var Communication = function(socket, visualizer) {
   this.visualizer = visualizer;
   this.sentMessages = {};
   this.slotMessages = {};
+  this.bufferedMessages = [];
 };
 
 Communication.ALGORITHM_MESSAGES = [
@@ -19,7 +20,7 @@ Communication.PROCESS_MESSAGES = [
 ];
 
 Communication.ALERT_MESSAGES = [
-  'Request', 'Slot'
+  'Request'
 ];
 
 Communication.prototype.data = function(data) {
