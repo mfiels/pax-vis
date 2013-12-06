@@ -26,3 +26,4 @@ Finally window 3 will run the optimized paxos algorithm:
 
 You will see the visualizer render the Paxos nodes. To start playback click the white playhead in the bottom left.
 
+For a very brief video [watch on YouTube](http://www.youtube.com/watch?v=fouOVyNdQW4).
